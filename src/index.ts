@@ -1,6 +1,12 @@
 import fs from "fs";
 import path from "path";
 
+
+enum SortingOrder{
+  Ascending="asc",
+  Descending="desc",
+}
+
 class NumberSorter {
   // Private ListOfNumbers Array
   public ListOfNumbers: number[] = [];
@@ -27,25 +33,55 @@ class NumberSorter {
     }
   }
 
-  // Method for sorting List of numbers
-  public sortIntoDescending(): void {
-    this.ListOfNumbers = this.mergeSort(this.ListOfNumbers);
+   // Sort the list of numbers in ascending order using Merge Sort algorithm
+   public sortAscending(): void {
+    this.ListOfNumbers = this.mergeSortAscending(this.ListOfNumbers);
   }
 
-  // Applied merge sort---> a sorting algorithm with worst complexity of O(n log n)
-  public mergeSort(numbers: number[]): number[] {
-    if (numbers.length <= 1) {
-      return numbers;
+  private mergeSortAscending(number: number[]): number[] {
+    if (number.length <= 1) {
+      return number;
     }
 
-    const mid = Math.floor(numbers.length / 2);
-    const left = numbers.slice(0, mid);
-    const right = numbers.slice(mid);
+    const mid = Math.floor(number.length / 2);
+    const left = number.slice(0, mid);
+    const right = number.slice(mid);
 
-    return this.mergeDescending(this.mergeSort(left), this.mergeSort(right));
+    return this.mergeAscending(this.mergeSortAscending(left), this.mergeSortAscending(right));
   }
 
-  public mergeDescending(left: number[], right: number[]): number[] {
+  private mergeAscending(left: number[], right: number[]): number[] {
+    let result: number[] = [];
+
+    while (left.length && right.length) {
+      if (left[0] < right[0]) {
+        result.push(left.shift()!);
+      } else {
+        result.push(right.shift()!);
+      }
+    }
+
+    return result.concat(left.slice()).concat(right.slice());
+  }
+
+  // Sort the list of numbers in descending order using Merge Sort algorithm
+  public sortDescending(): void {
+    this.ListOfNumbers = this.mergeSortDescending(this.ListOfNumbers);
+  }
+
+  private mergeSortDescending(number: number[]): number[] {
+    if (number.length <= 1) {
+      return number;
+    }
+
+    const mid = Math.floor(number.length / 2);
+    const left = number.slice(0, mid);
+    const right = number.slice(mid);
+
+    return this.mergeDescending(this.mergeSortDescending(left), this.mergeSortDescending(right));
+  }
+
+  private mergeDescending(left: number[], right: number[]): number[] {
     let result: number[] = [];
 
     while (left.length && right.length) {
@@ -72,27 +108,44 @@ class NumberSorter {
   }
 }
 
-function main() {
+function main():void {
   // const file = fs.readFileSync(path.join(__dirname, "input.txt"), "utf-8");
   // const [list] = file.split("\n");
   // const result = list;
   // fs.writeFileSync(path.join(__dirname, "output.txt"), result.toString());
+  const argv=process.argv.slice(2);
+
+  if(argv.length !== 3){
+    console.log("ERROR💥...Usage! Please run the command npm start <your_input_file.txt> <your_output_file.txt> <sorting_order>");
+    console.log(`Sorting order should be "asc" for ascending and "desc" for descending!`)
+    process.exit(1);
+  }
+
+  
+
+  const inputFile=argv[0];
+  const outputFile=argv[1];
+  const sortedOrder = argv[2] === SortingOrder.Ascending ? SortingOrder.Ascending : SortingOrder.Descending;
+
 
   const numberSorter = new NumberSorter();
 
   // Calling the ReadFile Method
-  numberSorter.readFromFile("input.txt");
+  numberSorter.readFromFile(inputFile);
 
   // Calling the Number sorting Method
-  numberSorter.sortIntoDescending();
+  if(sortedOrder===SortingOrder.Ascending){
+    numberSorter.sortAscending();
+  }else{
+    numberSorter.sortDescending();
+  }
 
   // Calling the WriteFile Method
-  numberSorter.writeToFile("output.txt");
+  numberSorter.writeToFile(outputFile);
 
   console.log(
-    `Sucessfully sorted ${numberSorter.ListOfNumbers.length} numbers and written into File output.txt!`
+    `Sucessfully sorted ${numberSorter.ListOfNumbers.length} numbers into ${sortedOrder}ending order and written to File output.txt!`
   );
 }
 main();
 
-export {};
