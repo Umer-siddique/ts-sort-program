@@ -21,11 +21,20 @@ class NumberSorter {
 
   // Read the list of numbers from the input file
   public readFromFile(inputFile: string): void {
+    let _data=[];
     try {
       const data = fs.readFileSync(path.join(__dirname, inputFile), "utf-8");
-      const values = data.split(", ");
-      for (const value of values) {
-        const num = Number(value.trim());
+      // console.log(data);
+      _data=[...data];
+      for(let i=0; i<=1000000;i++){
+        let j=Math.floor((Math.random()*i))
+        _data.push(j.toString());
+      }
+      console.log(_data);
+      // const __data=_data.toString();
+      // const values = _data.split(", ");
+      for (const value of _data) {
+        const num = Number(value);
         if (!isNaN(num)) {
           this.ListOfNumbers.push(num);
         }
@@ -228,6 +237,8 @@ function main(): void {
   // Calling the ReadFile Method
   numberSorter.readFromFile(inputFile);
 
+  const startTime=process.hrtime()
+
   // Calling the Number sorting Method
   if (
     sortedOrder === SortingOrder.Ascending &&
@@ -253,11 +264,15 @@ function main(): void {
     console.log("Error💥..Please select the sorting order and sorting algo..");
   }
 
+  const endTime=process.hrtime(startTime)
   // Calling the WriteFile Method
   numberSorter.writeToFile(outputFile);
 
+  const executionTime = endTime[0] + endTime[1] / 1e9;
+
   console.log(
-    `Sucessfully sorted ${numberSorter.ListOfNumbers.length} numbers into ${sortedOrder}ending order using ${algoName} sort and written to File output.txt!`
+    `Sucessfully sorted ${numberSorter.ListOfNumbers.length} numbers into ${sortedOrder} ending order using ${algoName} sort and written to File output.txt!`
   );
+  console.log(`The program execution time is ${executionTime} seconds.`);
 }
 main();
